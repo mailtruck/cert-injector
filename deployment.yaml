@@ -1,0 +1,35 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: cert-injector
+  name: cert-injector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cert-injector
+  template:
+    metadata:
+      labels:
+        app: cert-injector
+    spec:
+      containers:
+      - name: cert-injector
+        image: mailtruck/cert-injector:latest
+        env:
+        - name: CRT
+          value: /etc/tls/tls.crt
+        - name: KEY
+          value: /etc/tls/tls.key
+        - name: BASEURI
+          value: https://kong-admin-ssl.default.svc.cluster.local:8444
+        - name: HOSTS
+          value: mama.1415.media
+        volumeMounts:
+          - name: tls
+            mountPath: /etc/tls
+      volumes:
+        - name: tls
+          secret:
+            secretName: mama.1415.media
